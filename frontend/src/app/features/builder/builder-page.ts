@@ -87,7 +87,7 @@ import { AdminLangSwitcher } from '../../shared/admin-lang-switcher';
                   [options]="languageOptions()"
                   optionLabel="label"
                   optionValue="value"
-                  styleClass="w-28"
+                  styleClass="w-36"
                   [ngModel]="store.editLanguage()"
                   (ngModelChange)="store.editLanguage.set($event)"
                 />
