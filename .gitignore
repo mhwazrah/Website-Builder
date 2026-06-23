@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+**/dist/
+.angular/
+**/.angular/
+tmp/
+out-tsc/
+
+# Env
+.env
+.env.local
+**/.env
+
+# Uploads (user-generated media)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Coverage
+coverage/
+
+# Build/workflow scratch
+.build/

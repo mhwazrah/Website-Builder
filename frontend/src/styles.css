@@ -1,0 +1,508 @@
+@import 'tailwindcss';
+@plugin 'tailwindcss-primeui';
+/* Load PrimeIcons into the base layer so Tailwind text-size utilities
+   (text-2xl, etc.) can override the default .pi font-size on icons. */
+@import 'primeicons/primeicons.css' layer(base);
+@import 'quill/dist/quill.snow.css';
+@import 'intl-tel-input/build/css/intlTelInput.css';
+
+/* Runtime theme variables (overridden per-site by ThemeService). */
+:root {
+  --site-primary: #2563eb;
+  --site-secondary: #9333ea;
+}
+
+/* Crisper text rendering for the admin UI. */
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Smooth in-page anchor scrolling; offset for the sticky public navbar. */
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+/* Keep scrolled-to sections clear of the sticky navbar. */
+section[id] {
+  scroll-margin-top: 5rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Accessible, consistent keyboard focus across the admin tool. */
+:where(button, a, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--p-primary-color, #2563eb);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, 'Noto Sans', 'Noto Sans Arabic', sans-serif;
+}
+
+/* Default section entrance animation (applied by RevealDirective). */
+.reveal-init {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.reveal-in {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.6s ease,
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-init,
+  .reveal-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Reusable entrance keyframes for section content. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/*
+ * Staggered children: a renderer adds `.stagger` to a grid/list wrapper. Its
+ * direct children start hidden and fade up one after another once the parent
+ * section is revealed (RevealDirective adds `.reveal-in`). Honors reduced
+ * motion.
+ */
+.stagger > * {
+  opacity: 0;
+}
+.reveal-in .stagger > * {
+  animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.reveal-in .stagger > *:nth-child(1) {
+  animation-delay: 0.04s;
+}
+.reveal-in .stagger > *:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.reveal-in .stagger > *:nth-child(3) {
+  animation-delay: 0.16s;
+}
+.reveal-in .stagger > *:nth-child(4) {
+  animation-delay: 0.22s;
+}
+.reveal-in .stagger > *:nth-child(5) {
+  animation-delay: 0.28s;
+}
+.reveal-in .stagger > *:nth-child(6) {
+  animation-delay: 0.34s;
+}
+.reveal-in .stagger > *:nth-child(7) {
+  animation-delay: 0.4s;
+}
+.reveal-in .stagger > *:nth-child(n + 8) {
+  animation-delay: 0.46s;
+}
+.anim-float {
+  animation: float-y 6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stagger > * {
+    opacity: 1;
+  }
+  .reveal-in .stagger > *,
+  .anim-float {
+    animation: none;
+  }
+}
+
+/* Undo/redo share the pi-undo glyph (PrimeIcons has no dedicated redo icon);
+   one of the pair is mirrored so they read as a back/forward pair. Which one
+   is mirrored flips with direction so the pair stays correct in RTL: in LTR
+   redo is mirrored, in RTL undo is mirrored. */
+.redo-flip .p-button-icon,
+.undo-flip .p-button-icon {
+  display: inline-block;
+}
+.redo-flip .p-button-icon {
+  transform: scaleX(-1);
+}
+[dir='rtl'] .redo-flip .p-button-icon {
+  transform: none;
+}
+[dir='rtl'] .undo-flip .p-button-icon {
+  transform: scaleX(-1);
+}
+
+/*
+ * intl-tel-input (phone field): make the wrapper fill the field and give the
+ * country dropdown a solid surface that sits above the form. The library's own
+ * dropdown is only z-index:2 and its search box has no background, so the field
+ * behind shows through — fix both.
+ */
+.iti {
+  display: block;
+  width: 100%;
+}
+.iti__dropdown-content {
+  background-color: #fff !important;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.625rem;
+  box-shadow:
+    0 12px 28px -6px rgb(0 0 0 / 0.25),
+    0 8px 10px -6px rgb(0 0 0 / 0.15);
+  overflow: hidden;
+  /* The library's `.iti--inline-dropdown .iti__dropdown-content` sets z-index:2
+     (higher specificity than a bare class), so the open list renders behind the
+     fields below it. !important lifts it above the rest of the form. */
+  z-index: 1100 !important;
+}
+.iti__search-input {
+  background-color: #fff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+.iti__country-list {
+  background-color: #fff;
+}
+.iti__country:hover,
+.iti__country.iti__highlight {
+  background-color: #f3f4f6;
+}
+/* Dark theme for the country dropdown. The list is rendered on <body> (see
+   phone-input.ts dropdownContainer), so these are matched via `.theme-dark` on
+   <html> which the public site mirrors while in dark mode. */
+.theme-dark .iti__dropdown-content {
+  background-color: #1f2937 !important;
+  border-color: rgb(255 255 255 / 0.14);
+}
+.theme-dark .iti__search-input {
+  background-color: #1f2937 !important;
+  color: #e5e7eb !important;
+  border-bottom-color: rgb(255 255 255 / 0.14) !important;
+}
+.theme-dark .iti__country-list {
+  background-color: #1f2937;
+}
+.theme-dark .iti__country {
+  color: #e5e7eb;
+}
+.theme-dark .iti__dial-code {
+  color: #9ca3af;
+}
+.theme-dark .iti__country:hover,
+.theme-dark .iti__country.iti__highlight {
+  background-color: rgb(255 255 255 / 0.08);
+}
+
+/* PrimeNG toast defaults to a fixed 25rem width; cap it so it never exceeds
+   (and horizontally overflows) small mobile viewports. */
+.p-toast {
+  max-width: calc(100vw - 2rem);
+}
+
+/* Defer offscreen section rendering/paint (page speed). The intrinsic-size
+   keeps the scrollbar/anchor offsets sane before a section is painted; `auto`
+   caches each section's real size once rendered. */
+.cv-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 480px;
+}
+
+/* Containers that should render in the site's chosen Google font (public site
+   + builder/editor previews). Falls back to the inherited UI font when unset. */
+.site-font,
+.site-font :where(h1, h2, h3, h4, h5, h6, p, a, span, li, button, input, textarea, label, div) {
+  font-family: var(--site-font, inherit);
+}
+
+/* --- Public-site light/dark theming --------------------------------------
+   Surfaces/zebra are CSS variables so section backgrounds (set inline as
+   `var(--site-surface)` / `var(--site-zebra)`) flip with the theme. When the
+   public root has `.theme-dark`, the common light utility classes the
+   renderers use are remapped to dark values (admin UI is unaffected). */
+:root {
+  --site-surface: #ffffff;
+  --site-surface-2: #f9fafb;
+  --site-zebra: #f9fafb;
+  /* Owner-controlled global corner radius (0%–100% maps to 0–32px in
+     ThemeService.applyRadius); 16px ≈ the 50% default. */
+  --site-radius: 16px;
+}
+.theme-dark {
+  --site-surface: #1f2937;
+  --site-surface-2: #111827;
+  --site-zebra: rgb(255 255 255 / 0.04);
+  color-scheme: dark;
+}
+.theme-dark .bg-white {
+  background-color: var(--site-surface);
+}
+.theme-dark .bg-white\/90 {
+  background-color: color-mix(in srgb, var(--site-surface) 88%, transparent);
+}
+.theme-dark .bg-gray-50,
+.theme-dark .bg-gray-100 {
+  background-color: var(--site-surface-2);
+}
+.theme-dark .text-gray-900,
+.theme-dark .text-surface-900 {
+  color: #f3f4f6;
+}
+.theme-dark .text-gray-800,
+.theme-dark .text-surface-800 {
+  color: #e5e7eb;
+}
+.theme-dark .text-gray-700 {
+  color: #d1d5db;
+}
+.theme-dark .text-gray-600,
+.theme-dark .text-surface-600,
+.theme-dark .text-gray-500 {
+  color: #9ca3af;
+}
+.theme-dark .text-gray-400 {
+  color: #6b7280;
+}
+.theme-dark .rich-text {
+  color: #cbd5e1;
+}
+.theme-dark .border-gray-100,
+.theme-dark .border-gray-200,
+.theme-dark .border-surface-200 {
+  border-color: rgb(255 255 255 / 0.12);
+}
+.theme-dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgb(255 255 255 / 0.12);
+}
+.theme-dark .border-gray-300 {
+  border-color: rgb(255 255 255 / 0.18);
+}
+/* Hover backgrounds: the light hover utilities (e.g. hover:bg-gray-50) are not
+   matched by the .bg-gray-50 remap above, so without this a button or link
+   would flash a white background on hover in dark mode (with its now-light icon
+   becoming invisible). Use a subtle light overlay instead. */
+.theme-dark .hover\:bg-gray-50:hover,
+.theme-dark .hover\:bg-gray-100:hover,
+.theme-dark .hover\:bg-white:hover {
+  background-color: rgb(255 255 255 / 0.08);
+}
+/* Form fields: keep typed text and placeholders legible on the dark surface
+   (the intl-tel search box gets a dark background of its own in dark mode). */
+.theme-dark input,
+.theme-dark textarea,
+.theme-dark select,
+.theme-dark .p-inputtext {
+  color: #e5e7eb;
+}
+.theme-dark input::placeholder,
+.theme-dark textarea::placeholder,
+.theme-dark .p-inputtext::placeholder {
+  color: rgb(229 231 235 / 0.45);
+}
+
+/* --- Owner-controlled global corner radius -------------------------------
+   Every non-circular rounded utility used by the public renderers resolves to
+   the single --site-radius token so the whole site shares one corner style
+   (set per-site in Settings). Scoped to `.site-font` (public site + builder/
+   editor previews) so the admin chrome keeps its own radii. `rounded-full` is
+   intentionally left out — it stays circular for avatars, badges and dots. */
+.site-font :is(.rounded, .rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl, .rounded-3xl) {
+  border-radius: var(--site-radius);
+}
+.site-font :is(.p-inputtext, .p-button, .p-select) {
+  border-radius: var(--site-radius);
+}
+
+/* Native <button> shows the default arrow cursor; make clickable public-site
+   buttons (theme/language toggles, hamburger, contact submit, …) use a pointer. */
+.site-font button:not(:disabled) {
+  cursor: pointer;
+}
+
+/* --- Animated hamburger (nav-icon2): three bars morph into an X ----------- */
+.nav-icon2 {
+  position: relative;
+  width: 26px;
+  height: 22px;
+  cursor: pointer;
+}
+.nav-icon2 span {
+  display: block;
+  position: absolute;
+  height: 2.5px;
+  width: 50%;
+  background: currentColor;
+  opacity: 1;
+  transform: rotate(0deg);
+  transition: 0.25s ease-in-out;
+}
+.nav-icon2 span:nth-child(even) {
+  left: 50%;
+  border-radius: 0 2.5px 2.5px 0;
+}
+.nav-icon2 span:nth-child(odd) {
+  left: 0;
+  border-radius: 2.5px 0 0 2.5px;
+}
+.nav-icon2 span:nth-child(1),
+.nav-icon2 span:nth-child(2) {
+  top: 0;
+}
+.nav-icon2 span:nth-child(3),
+.nav-icon2 span:nth-child(4) {
+  top: 10px;
+}
+.nav-icon2 span:nth-child(5),
+.nav-icon2 span:nth-child(6) {
+  top: 20px;
+}
+.nav-icon2.open span:nth-child(1),
+.nav-icon2.open span:nth-child(6) {
+  transform: rotate(45deg);
+}
+.nav-icon2.open span:nth-child(2),
+.nav-icon2.open span:nth-child(5) {
+  transform: rotate(-45deg);
+}
+.nav-icon2.open span:nth-child(1) {
+  left: 2.5px;
+  top: 5px;
+}
+.nav-icon2.open span:nth-child(2) {
+  left: calc(50% - 2.5px);
+  top: 5px;
+}
+.nav-icon2.open span:nth-child(3) {
+  left: -50%;
+  opacity: 0;
+}
+.nav-icon2.open span:nth-child(4) {
+  left: 100%;
+  opacity: 0;
+}
+.nav-icon2.open span:nth-child(5) {
+  left: 2.5px;
+  top: 15px;
+}
+.nav-icon2.open span:nth-child(6) {
+  left: calc(50% - 2.5px);
+  top: 15px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-icon2 span {
+    transition: none;
+  }
+}
+
+/* Soft layered card elevation for public-site card grids (cards/features/team/
+   testimonials/pricing) so they read as elevated surfaces on white, not flat
+   hairline boxes. */
+.card-elevation {
+  box-shadow:
+    0 1px 2px rgb(16 24 40 / 0.04),
+    0 10px 24px -14px rgb(16 24 40 / 0.18);
+}
+
+/* Brand-tinted keyboard focus ring for public-site interactive elements
+   (nav links, accordion headers, card links) — WCAG 2.4.7. */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px #ffffff,
+    0 0 0 4px var(--site-primary);
+  border-radius: 6px;
+}
+
+/* When a revealed section staggers its children, let only the children carry
+   the vertical motion (the parent fades) to avoid a double translateY. */
+.reveal-init:has(.stagger),
+.reveal-in:has(.stagger) {
+  transform: none;
+}
+
+/* ngx-scrollbar: subtle, on-brand overlay scrollbar. */
+ng-scrollbar {
+  --scrollbar-thumb-color: rgb(148 163 184 / 0.5);
+  --scrollbar-thumb-hover-color: rgb(100 116 139 / 0.8);
+  --scrollbar-size: 8px;
+  --scrollbar-thumb-transition: height ease-out 150ms, width ease-out 150ms;
+}
+
+/* Quill: make RTL editing behave when a site is Arabic. */
+[dir='rtl'] .ql-editor {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Rich-text output rendered on the public site / preview. */
+.rich-text :where(h1, h2, h3) {
+  font-weight: 700;
+  line-height: 1.2;
+}
+.rich-text :where(ul, ol) {
+  margin: 0.5rem 0;
+  padding-inline-start: 1.5rem;
+}
+.rich-text ul {
+  list-style: disc;
+}
+.rich-text ol {
+  list-style: decimal;
+}
+.rich-text a {
+  color: var(--site-primary);
+  text-decoration: underline;
+}
+.rich-text p {
+  margin: 0.25rem 0;
+}
+
+/* CDK drag-and-drop affordances. */
+.cdk-drag-preview {
+  box-shadow:
+    0 5px 5px -3px rgb(0 0 0 / 0.2),
+    0 8px 10px 1px rgb(0 0 0 / 0.14);
+  border-radius: 0.5rem;
+}
+.cdk-drag-placeholder {
+  opacity: 0.4;
+}
+.cdk-drag-animating {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}

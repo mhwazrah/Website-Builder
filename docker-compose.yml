@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: website_builder_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: builder
+      POSTGRES_PASSWORD: builder_pass
+      POSTGRES_DB: website_builder
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U builder -d website_builder']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Optional: a DB admin UI. Visit http://localhost:8080
+  adminer:
+    image: adminer:latest
+    container_name: website_builder_adminer
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
