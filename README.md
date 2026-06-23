@@ -21,6 +21,7 @@ from their own logo, and publish under a subdomain at `/site/{subdomain}` — no
 ## 📑 Table of contents
 
 - [Overview](#-overview)
+- [Screenshots](#-screenshots)
 - [Features](#-features)
 - [Tech stack](#-tech-stack)
 - [Architecture](#-architecture)
@@ -50,6 +51,28 @@ embedded behind an existing application's auth layer.
 > drag-and-drop builder supports multi-page sites, draft/publish, undo/redo and a device
 > preview, and every site is themeable (colours, Google font, corner radius, light/dark theme),
 > bilingual and RTL-aware.
+
+---
+
+## 📸 Screenshots
+
+### The drag-and-drop builder
+Edit pages, the navbar and the footer on the left while a live preview updates on the right —
+with language toggle, device preview, undo/redo and one-click publish.
+
+![The drag-and-drop builder, with the editing panels on the left and a live preview on the right](docs/screenshots/builder.png)
+
+### Site settings & theming
+Set the name and subdomain, language mode, light/dark theme and per-theme backgrounds, upload a
+logo (brand colours and the favicon are derived from it) and tune the brand palette.
+
+![Site settings page showing general, language, theme, logo and brand-colour controls](docs/screenshots/settings.png)
+
+### The published site
+The finished, responsive site visitors see at `/site/{subdomain}` — themeable, bilingual and
+RTL-aware, with a visitor language and light/dark switch in the navbar.
+
+![The published demo site rendering a features section and FAQ](docs/screenshots/published-site.png)
 
 ---
 
